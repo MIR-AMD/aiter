@@ -117,7 +117,9 @@ def fp8_mqa_logits(
     stride_w_s, stride_w_h = weights.stride()
     stride_logits_s, stride_logits_k = logits.stride()
     if not use_gluon:
-        block_kv = 128
+        # GLM53_FP8_MQA_GFX942_LDS: gfx942 has no gluon fp8_mqa_logits kernel; the generic
+        # kernel at BLOCK_KV=128 needs 80KB LDS > gfx942's 64KB. Halve it.
+        block_kv = 64
 
         # heuristic for MFMA instruction shape
         matrix_instr_nonkdim = 32
